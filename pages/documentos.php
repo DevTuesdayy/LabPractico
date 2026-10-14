@@ -82,7 +82,7 @@
         <div class="search-row">
             <!-- Aqui va el buscador -->
 
-            <span class="seacrh-icon">
+            <span class="search-icon">
                 <!-- Icono de busqueda -->
             </span>
 
@@ -92,12 +92,69 @@
         </div>
 
         <div class="filter-rows">
-            <!-- Aquí van los filtros -->ƒ
+            <!-- Aquí van los filtros -->
+
+            <div class="filters-group">
+                <label for="status">ESTATUS</label>
+
+                <select name="estatus" id="status">
+                    <option>Todos los estatus</option>
+                    <option>Recibido</option>
+                    <option>En proceso</option>
+                    <option>Turnado</option>
+                    <option>Agrupado</option>
+                    <option>Atendido</option>
+                    <option>Urgente</option>
+                </select>
+            </div>
+
+            <div class="filters-group">
+                <label for="desde">DESDE</label>
+                <select name="desde" id="desde">
+                    <!-- Aqui va el calendario -->
+                </select>
+            </div>
+
+            <div class="filters-group">
+                <label for="hasta">HASTA</label>
+                <select name="hasta" id="hasta">
+                    <!-- Aqui va el calendario -->
+                </select>
+            </div>
+
+            <div class="filters-group">
+                <label for="tipo" id="tipo">TIPO</label>
+                <select name="tipo" id="area">
+                    <option>Todos los tipos</option>
+                    <option>Oficio Ordinario</option>
+                    <option>Circular</option>
+                    <option>Memorandum</option>
+                    <option>Peticion Externa</option>
+                </select>
+            </div>
+
+            <div class="filters-group">
+                <label for="area" id="area">AREA</label>
+                <select name="area" id="area">
+                    <option>Todos las areas</option>
+                    <option>Rectoría General</option>
+                    <option>Dirección Administrativa</option>
+                    <option>Coordinación Académica</option>
+                    <option>Depto. de Sistemas</option>
+                    <option>Coordinación de Investigación</option>
+                </select>
+            </div>
+
         </div>
 
         <div class="filter-actions">
             <!-- Aqui van las acciones -->
+            <div class=" filters-group">
+                <label for="filtros-activos">FILTROS ACTIVOS</label>
+
+                <button Type="button" id="filtros-activos">
+                    <!-- Icono de filtros activos -->
+            </div>
         </div>
     </form>
-
 </section>
