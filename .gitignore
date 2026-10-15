@@ -1,2 +1,5 @@
 /config/conexion.php
 .DS_Store
+__pycache__/
+/storage/documentos/*
+!/storage/documentos/.gitkeep

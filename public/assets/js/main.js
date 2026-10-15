@@ -1,177 +1,124 @@
-/* main.js: controla las interacciones visuales del frontend sin comunicarse con el backend. */
+/* Búsqueda de documentos y registro con PDF. */
 (function () {
-  function ready(callback) {
-    if (window.jQuery) {
-      window.jQuery(callback);
-    } else if (document.readyState !== "loading") {
-      callback();
-    } else {
-      document.addEventListener("DOMContentLoaded", callback);
-    }
-  }
+  function iniciar() {
+    var filas = Array.from(document.querySelectorAll("[data-documento]"));
+    var buscador = document.getElementById("search-documentos");
+    var estado = document.getElementById("estado-documentos");
 
-  ready(function () {
-    var $ = window.jQuery;
-    var toast = function (message, type) {
-      var node = document.querySelector(".ui-toast");
-      if (!node) {
-        node = document.createElement("div");
-        node.className = "ui-toast";
-        document.body.appendChild(node);
-      }
-      node.textContent = message;
-      node.className = "ui-toast is-visible " + (type || "");
-      window.clearTimeout(node._timer);
-      node._timer = window.setTimeout(function () {
-        node.classList.remove("is-visible");
-      }, 2600);
-    };
+    function filtrar() {
+      var texto = buscador.value.toLowerCase().trim();
+      var visibles = 0;
 
-    /* Tabla: búsqueda, selección masiva y paginación visual. */
-    /* Tabla: búsqueda, selección masiva y paginación visual. */
-    var table = document.querySelector(".documents-table");
-    if (table) {
-      var rows = Array.prototype.slice.call(table.querySelectorAll("tbody tr"));
-      var search = document.querySelector(".search-row input");
-      var visibleLabel = document.querySelector(".select-visible span");
-      var refreshRows = function () {
-        var query = (search ? search.value : "").toLowerCase().trim();
-        var visible = rows.filter(function (row) {
-          var match =
-            !query || row.textContent.toLowerCase().indexOf(query) !== -1;
-          row.hidden = !match;
-          return match;
-        });
-        if (visibleLabel) {
-          visibleLabel.textContent =
-            "Seleccionar visibles (" + visible.length + ")";
-        }
-      };
-      if (search) {
-        search.addEventListener("input", refreshRows);
-      }
-      var master = document.querySelector(".select-visible input");
-      if (master) {
-        master.addEventListener("change", function () {
-          rows.forEach(function (row) {
-            if (!row.hidden) {
-              var input = row.querySelector('input[type="checkbox"]');
-              if (input) input.checked = master.checked;
-            }
-          });
-        });
-      }
-      document
-        .querySelectorAll(".pagination button:not(:disabled)")
-        .forEach(function (button) {
-          button.addEventListener("click", function () {
-            document
-              .querySelectorAll(".pagination .current")
-              .forEach(function (item) {
-                item.classList.remove("current");
-              });
-            if (/^\d+$/.test(button.textContent.trim())) {
-              button.classList.add("current");
-            }
-            toast("Página " + button.textContent.trim() + " seleccionada");
-          });
-        });
-    }
-
-    /* Filtros y acciones rápidas. */
-    /* Filtros y acciones rápidas. */
-    document.querySelectorAll(".clear-filters").forEach(function (button) {
-      button.addEventListener("click", function () {
-        var form = button.closest("form");
-        if (form) {
-          form.reset();
-        }
-        document
-          .querySelectorAll(".active-filters span")
-          .forEach(function (chip) {
-            chip.remove();
-          });
-        toast("Filtros limpiados");
+      filas.forEach(function (fila) {
+        var coincide = fila.textContent.toLowerCase().includes(texto);
+        var coincideEstado = !estado.value || fila.dataset.estado === estado.value;
+        fila.hidden = !(coincide && coincideEstado);
+        if (!fila.hidden) visibles++;
       });
-    });
-    document.querySelectorAll(".apply-filters").forEach(function (button) {
-      button.addEventListener("click", function (event) {
+
+      document.getElementById("sin-resultados").hidden = visibles !== 0;
+      document.getElementById("documentos-count").textContent =
+        "Mostrando " + visibles + " de " + filas.length + " documentos";
+    }
+
+    if (buscador && estado) {
+      buscador.addEventListener("input", filtrar);
+      estado.addEventListener("change", filtrar);
+    }
+
+    var formulario = document.getElementById("register-form");
+    if (!formulario) return;
+
+    var archivoInput = document.getElementById("archivo_pdf");
+    var zonaArchivo = document.querySelector(".upload-box");
+    var infoArchivo = document.getElementById("archivo-info");
+    var aviso = document.getElementById("register-feedback");
+    var boton = formulario.querySelector('button[type="submit"]');
+
+    function mostrarArchivo() {
+      var archivo = archivoInput.files[0];
+      infoArchivo.textContent = archivo
+        ? archivo.name + " · " + (archivo.size / 1024 / 1024).toFixed(2) + " MB"
+        : "Ningún archivo seleccionado.";
+    }
+
+    function resultado(mensaje, correcto, id) {
+      aviso.hidden = false;
+      aviso.className = "form-feedback " + (correcto ? "success" : "error");
+      aviso.setAttribute("role", correcto ? "status" : "alert");
+      aviso.replaceChildren(document.createTextNode(mensaje));
+
+      if (correcto && Number.isInteger(id)) {
+        var enlace = document.createElement("a");
+        enlace.href = "index.php?page=detalle-documento&id=" + id;
+        enlace.textContent = "Ver documento";
+        aviso.appendChild(enlace);
+      }
+    }
+
+    archivoInput.addEventListener("change", mostrarArchivo);
+    ["dragenter", "dragover"].forEach(function (evento) {
+      zonaArchivo.addEventListener(evento, function (event) {
         event.preventDefault();
-        toast("Filtros aplicados", "success");
+        zonaArchivo.classList.add("is-dragging");
       });
     });
-    document.querySelectorAll(".row-actions button").forEach(function (button) {
-      button.addEventListener("click", function () {
-        toast(button.getAttribute("aria-label") || "Acción seleccionada");
-      });
-    });
-
-    /* Carga visual de archivos mediante selector o arrastre. */
-    /* Carga visual de archivos mediante selector o arrastre. */
-    var upload = document.querySelector(".upload-box");
-    var fileInput = upload ? upload.querySelector('input[type="file"]') : null;
-    if (upload && fileInput) {
-      upload.addEventListener("click", function () {
-        fileInput.click();
-      });
-      ["dragenter", "dragover"].forEach(function (eventName) {
-        upload.addEventListener(eventName, function (event) {
-          event.preventDefault();
-          upload.classList.add("is-dragging");
-        });
-      });
-      ["dragleave", "drop"].forEach(function (eventName) {
-        upload.addEventListener(eventName, function (event) {
-          event.preventDefault();
-          upload.classList.remove("is-dragging");
-        });
-      });
-      upload.addEventListener("drop", function (event) {
-        if (event.dataTransfer.files.length) {
-          fileInput.files = event.dataTransfer.files;
-          fileInput.dispatchEvent(new Event("change"));
-        }
-      });
-      fileInput.addEventListener("change", function () {
-        if (fileInput.files[0]) {
-          upload.querySelector("strong").textContent = fileInput.files[0].name;
-          upload.classList.add("has-file");
-          toast("Archivo listo para revisión", "success");
-        }
-      });
-    }
-
-    /* Validación visual del formulario de registro. */
-    /* Validación visual del formulario de registro. */
-    var registerForm = document.getElementById("register-form");
-    if (registerForm) {
-      registerForm.addEventListener("submit", function (event) {
+    ["dragleave", "drop"].forEach(function (evento) {
+      zonaArchivo.addEventListener(evento, function (event) {
         event.preventDefault();
-        var required = Array.prototype.slice.call(
-          registerForm.querySelectorAll(
-            "input:not([readonly]), select, textarea",
-          ),
-        );
-        var empty = required.filter(function (field) {
-          return !field.value.trim();
+        zonaArchivo.classList.remove("is-dragging");
+      });
+    });
+    zonaArchivo.addEventListener("drop", function (event) {
+      if (event.dataTransfer.files.length) {
+        archivoInput.files = event.dataTransfer.files;
+        mostrarArchivo();
+      }
+    });
+
+    formulario.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      if (boton.disabled || !formulario.reportValidity()) return;
+
+      var archivo = archivoInput.files[0];
+      if (!archivo || archivo.size === 0 || archivo.size > 25 * 1024 * 1024) {
+        resultado("Selecciona un PDF con contenido y de hasta 25 MB.", false);
+        return;
+      }
+
+      boton.disabled = true;
+      boton.textContent = "Guardando…";
+
+      try {
+        var respuesta = await fetch(formulario.action, {
+          method: "POST",
+          headers: { Accept: "application/json" },
+          body: new FormData(formulario)
         });
-        required.forEach(function (field) {
-          field.classList.toggle("field-error", !field.value.trim());
-        });
-        if (empty.length) {
-          toast("Revisa los campos obligatorios", "error");
-          empty[0].focus();
+        var datos = await respuesta.json();
+
+        if (!respuesta.ok || !datos.ok) {
+          resultado(datos.mensaje || "No se pudo guardar el documento.", false);
           return;
         }
-        toast("Formulario listo para guardar", "success");
-      });
-      registerForm
-        .querySelectorAll("input, select, textarea")
-        .forEach(function (field) {
-          field.addEventListener("input", function () {
-            field.classList.remove("field-error");
-          });
-        });
-    }
-  });
+
+        formulario.reset();
+        mostrarArchivo();
+        resultado(datos.mensaje, true, datos.id_documento);
+      } catch (error) {
+        resultado("No se pudo completar el envío. Intenta nuevamente.", false);
+      } finally {
+        boton.disabled = false;
+        boton.textContent = "Guardar documento";
+      }
+    });
+  }
+
+  if (window.jQuery) {
+    window.jQuery(iniciar);
+  } else if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", iniciar);
+  } else {
+    iniciar();
+  }
 })();

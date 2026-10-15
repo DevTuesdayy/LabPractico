@@ -1,39 +1,28 @@
-<header class="home-header">
-        <a class="home-brand" href="index.php?page=inicio"><span
-                class="home-brand-icon">✦</span><span><strong>DocuFlow</strong><small>GESTIÓN
-                    DOCUMENTAL</small></span></a>
-        <span class="home-status"><i></i> Sistema operativo</span>
-    </header>
-    <main class="home-content">
-        <section class="home-hero">
-            <div class="home-hero-copy">
-                <span class="home-badge">CENTRO DE OPERACIONES</span>
-                <h1>Todo tu flujo documental, <em>en un solo lugar.</em></h1>
-                <p>Gestiona oficios, digitaliza evidencias y da seguimiento a cada documento con una experiencia clara y
-                    ordenada.</p>
-                <div class="home-actions"><a href="index.php?page=documentos" class="home-cta primary-link">Abrir panel
-                        <span>→</span></a><a href="index.php?page=registrar-documento"
-                        class="home-cta secondary-link">Registrar oficio <span>＋</span></a></div>
+<div class="app-shell">
+    <?php require __DIR__ . '/../partials/sidebar.php'; ?>
+    <div class="app-main">
+        <?php require __DIR__ . '/../partials/header.php'; ?>
+        <main class="page-content">
+            <section class="home-intro">
+                <p class="eyebrow">BIENVENIDO A DOCUFLOW</p>
+                <h1>Los documentos de tu oficina, en un solo lugar.</h1>
+                <p class="muted">Registra oficios, consulta su información y descarga los archivos que necesitas.</p>
+                <a class="button" href="index.php?page=documentos">Ver documentos →</a>
+            </section>
+            <div class="home-links">
+                <a class="panel home-link" href="index.php?page=documentos">
+                    <span class="home-link-icon" aria-hidden="true">▤</span>
+                    <h2>Consultar documentos</h2>
+                    <p class="muted">Busca un oficio y revisa sus datos y su PDF adjunto.</p>
+                    <span class="link-label">Abrir bandeja →</span>
+                </a>
+                <a class="panel home-link" href="index.php?page=registrar-documento">
+                    <span class="home-link-icon" aria-hidden="true">+</span>
+                    <h2>Registrar documento</h2>
+                    <p class="muted">Agrega un oficio recibido y adjunta su archivo PDF.</p>
+                    <span class="link-label">Nuevo registro →</span>
+                </a>
             </div>
-            <div class="home-visual">
-                <div class="visual-glow"></div>
-                <div class="visual-card"><span class="visual-label">ACTIVIDAD DE
-                        HOY</span><strong>148</strong><small>oficios registrados</small>
-                    <div class="visual-chart"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-                    <div class="visual-foot"><span><b></b> +14 hoy</span><span>Panel activo</span></div>
-                </div>
-            </div>
-        </section>
-        <section class="home-links"><a href="index.php?page=documentos" class="home-link"><span
-                    class="home-link-icon">▤</span><span><strong>Bandeja de documentos</strong><small>Consulta, filtra y
-                        organiza los oficios registrados</small></span><b>→</b></a><a
-                href="index.php?page=registrar-documento" class="home-link"><span
-                    class="home-link-icon purple">＋</span><span><strong>Registrar documento</strong><small>Captura un
-                        nuevo oficio y digitaliza su evidencia</small></span><b>→</b></a>
-            <div class="home-mini-stats">
-                <span><strong>24/7</strong><small>Disponibilidad</small></span><span><strong>99.2%</strong><small>Legibilidad
-                        OCR</small></span><span><strong>100%</strong><small>Trazabilidad</small></span>
-            </div>
-        </section>
-    </main>
-    <footer class="home-footer">DocuFlow <span>•</span> Gestión documental institucional</footer>
+        </main>
+    </div>
+</div>

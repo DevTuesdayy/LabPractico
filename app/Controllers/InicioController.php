@@ -8,7 +8,7 @@ class InicioController extends Controller
             'home/index',
             'DocuFlow | Gestión Documental',
             'home-page',
-            ['ui-refresh.css'],
+            [],
             false
         );
     }

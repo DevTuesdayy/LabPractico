@@ -1,8 +1,0 @@
-/* ui-interactions.css: estados visuales para avisos, errores y carga de archivos. */ .ui-toast{ position:fixed; z-index:20; right:24px; bottom:24px; max-width:310px; padding:14px 17px; border:1px solid #dedff2; border-radius:12px; background:#252942; color:#fff; font-size:13px; font-weight:700; box-shadow:0 14px 30px #20243a35; opacity:0; pointer-events:none; transform:translateY(12px); transition:.25s}
-.ui-toast.is-visible{ opacity:1; transform:translateY(0)}
-.ui-toast.success{ background:#087258; border-color:#0b8a6a}
-.ui-toast.error{ background:#c52e36; border-color:#e15359}
-.field-error{ border-color:#dc4a52!important; background:#fff4f4!important; box-shadow:0 0 0 3px #dc4a5217!important}
-.upload-box.is-dragging{ border-color:#5b4be8; background:#edecff; transform:scale(1.01)}
-.upload-box.has-file{ border-style:solid; border-color:#4ab78f; background:#edfbf5}
-.upload-box.has-file span{ color:#159b70}

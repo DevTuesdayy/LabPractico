@@ -7,7 +7,8 @@ abstract class Controller
         string $titulo,
         string $claseBody,
         array $estilos,
-        bool $cargarScripts = true
+        bool $cargarScripts = true,
+        array $datos = []
     ): void {
         $vista = __DIR__ . '/../Views/' . $archivo . '.php';
         require __DIR__ . '/../Views/layouts/main.php';
