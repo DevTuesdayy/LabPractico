@@ -1,7 +1,8 @@
 <?php
 
 return [
-    'documentos' => 'index',
-    'registrar-documento' => 'create',
-    'detalle-documento' => 'show',
+    'inicio' => [InicioController::class, 'index'],
+    'documentos' => [DocumentoController::class, 'index'],
+    'registrar-documento' => [DocumentoController::class, 'create'],
+    'detalle-documento' => [DocumentoController::class, 'show'],
 ];

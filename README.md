@@ -1,17 +1,20 @@
 # LabPractico — DocuFlow
 
 Aplicación de gestión documental en PHP y MySQL. La estructura prepara MVC sin
-framework. El registro y el detalle conservan sus vistas vacías; todavía no hay
-autenticación ni operaciones de documentos en la base desde el controlador.
+framework e integra el frontend de la rama `tue`. Inicio, bandeja, registro y
+detalle conservan sus datos de demostración; todavía no están conectados al
+guardado y consulta de documentos reales. El controlador de autenticación local
+sigue en desarrollo y aún no tiene ruta pública.
 
 ## Estructura
 
 ```text
 app/
-  Controllers/DocumentoController.php
+  Controllers/                    # Inicio, documentos y autenticación
   Models/                         # Consultas y acceso a datos
   Views/
     documentos/                   # index.php, create.php, show.php
+    home/index.php                # Bienvenida del frontend remoto
     layouts/main.php              # Plantilla de la página
     partials/                     # header.php y sidebar.php
 config/
@@ -29,19 +32,22 @@ index.php                         # Redirección temporal a public/index.php
 
 ## Recorrido de una petición
 
-`public/index.php` consulta `routes/web.php`, llama a `DocumentoController` y este
-carga una vista dentro de `main.php`. Los modelos se añadirán al implementar el
-acceso a datos. Las vistas mantienen el HTML del frontend existente.
+`public/index.php` consulta `routes/web.php` y llama al controlador correspondiente.
+`InicioController` y `DocumentoController` comparten la carga de vistas y del
+layout `main.php` mediante `Controller`. Las vistas mantienen el HTML del
+frontend remoto, con enlaces adaptados a las rutas MVC. CSS y JavaScript se
+conservan tal como llegaron de `tue`.
 
 Rutas actuales:
 
 - `index.php`: bandeja de documentos.
+- `index.php?page=inicio`: bienvenida.
 - `index.php?page=registrar-documento`: vista de registro.
 - `index.php?page=detalle-documento`: vista de detalle.
 
-Para el login se añadirán `app/Controllers/AuthController.php`,
-`app/Models/Usuario.php` y `app/Views/auth/login.php`. El formulario enviará la
-petición a una ruta de la entrada pública; no se accederá al controlador por URL.
+Para continuar el login se completarán `app/Controllers/AuthController.php`,
+`app/Models/Usuario.php` y la vista `app/Views/auth/login.php`. El formulario enviará
+la petición a una ruta de la entrada pública; no se accederá al controlador por URL.
 
 ## Configuración local
 
