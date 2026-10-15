@@ -33,22 +33,22 @@
             <!-- Titulo principal -->
             <h2> PRINCIPAL</h2>
 
-            <a class="navigation-link" href="../index.php">
+            <a class="navigation-link" href="index.php">
                 <!-- Inicio -->
                 <span>Inicio</span>
             </a>
 
-            <a class="navigation-link" href="documentos.php">
+            <a class="navigation-link" href="index.php?page=documentos#documentos">
                 <!-- Documentos -->
                 <span>Documentos</span>
             </a>
 
-            <a class="navigation-link" href="registrar-documento.php">
+            <a class="navigation-link" href="index.php?page=registrar-documento">
                 <!-- Nuevo Documento  -->
                 <span>Nuevo Documento</span>
             </a>
 
-            <a class="navigation-link" href="documentos.php#buscador">
+            <a class="navigation-link" href="index.php?page=documentos#buscador">
                 <!-- Buscar  -->
                 <span>Buscar</span>
             </a>

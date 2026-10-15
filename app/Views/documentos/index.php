@@ -76,7 +76,7 @@
 
 </section>
 
-<section class="filters-panel">
+<section class="filters-panel" id="buscador">
 
     <form class="filter-form">
         <div class="search-row">
@@ -123,8 +123,8 @@
             </div>
 
             <div class="filters-group">
-                <label for="tipo" id="tipo">TIPO</label>
-                <select name="tipo" id="area">
+                <label for="tipo">TIPO</label>
+                <select name="tipo" id="tipo">
                     <option>Todos los tipos</option>
                     <option>Oficio Ordinario</option>
                     <option>Circular</option>
@@ -134,7 +134,7 @@
             </div>
 
             <div class="filters-group">
-                <label for="area" id="area">AREA</label>
+                <label for="area">AREA</label>
                 <select name="area" id="area">
                     <option>Todos las areas</option>
                     <option>Rectoría General</option>
@@ -152,8 +152,10 @@
             <div class=" filters-group">
                 <label for="filtros-activos">FILTROS ACTIVOS</label>
 
-                <button Type="button" id="filtros-activos">
+                <button type="button" id="filtros-activos">
                     <!-- Icono de filtros activos -->
+                    Ver filtros activos
+                </button>
             </div>
         </div>
     </form>

@@ -1,16 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
+<?php
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="assests/css/styles.css">
-</head>
-
-<body>
-
-    <h1>Welcome to the Document Management System</h1>
-
-</body>
-
-</html>
+// Compatibilidad mientras Apache todavía apunta a la raíz del proyecto.
+$consulta = http_build_query($_GET);
+header('Location: public/index.php' . ($consulta === '' ? '' : '?' . $consulta));
+exit;
