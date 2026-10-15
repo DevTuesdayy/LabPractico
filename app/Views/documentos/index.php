@@ -77,7 +77,12 @@ $escapar = fn($valor) => htmlspecialchars((string) $valor, ENT_QUOTES, 'UTF-8');
                                     <span class="status <?= $clasesEstado[$documento['estado']] ?? 'received' ?>"><?= $escapar($documento['estado']) ?></span>
                                 </td>
                                 <td data-label="Acciones" class="document-action-cell">
+                                    <div class="document-actions">
                                     <a class="button button-secondary button-small" href="index.php?page=detalle-documento&amp;id=<?= (int) $documento['id_documento'] ?>" aria-label="Ver detalle del oficio <?= $escapar($documento['no_oficio']) ?>">Ver detalle</a>
+                                    <a class="button button-secondary preview-eye" data-pdf-preview href="index.php?page=ver-pdf&amp;id=<?= (int) $documento['id_documento'] ?>" target="_blank" rel="noopener" title="Vista previa del PDF" aria-label="Vista previa del PDF del oficio <?= $escapar($documento['no_oficio']) ?>">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </a>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -91,3 +96,4 @@ $escapar = fn($valor) => htmlspecialchars((string) $valor, ENT_QUOTES, 'UTF-8');
         </main>
     </div>
 </div>
+<?php require __DIR__ . '/../partials/pdf-preview.php'; ?>

@@ -1,0 +1,4 @@
+Options -Indexes
+
+# Impide descargar archivos ocultos, incluido el repositorio Git.
+RedirectMatch 404 "(^|/)\."

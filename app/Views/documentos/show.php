@@ -44,6 +44,7 @@ $clasesEstado = ['Recibido' => 'received', 'En proceso' => 'in-progress', 'Atend
                     <?php if ($datos['archivoDisponible']): ?>
                         <p class="file-title">PDF del oficio <?= $escapar($documento['no_oficio']) ?></p>
                         <p class="muted"><?= number_format((int) $datos['archivoTamano'] / 1024, 0, ',', '.') ?> KB</p>
+                        <a class="button button-secondary download-button" data-pdf-preview href="index.php?page=ver-pdf&amp;id=<?= (int) $documento['id_documento'] ?>" target="_blank" rel="noopener">Vista previa</a>
                         <a class="button download-button" href="index.php?page=descargar-documento&amp;id=<?= (int) $documento['id_documento'] ?>">Descargar PDF</a>
                     <?php else: ?>
                         <p class="muted">El archivo adjunto no está disponible.</p>
@@ -87,3 +88,5 @@ $clasesEstado = ['Recibido' => 'received', 'En proceso' => 'in-progress', 'Atend
         </main>
     </div>
 </div>
+
+<?php require __DIR__ . '/../partials/pdf-preview.php'; ?>

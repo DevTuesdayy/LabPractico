@@ -144,6 +144,16 @@ class DocumentoController extends Controller{
 
     public function download(): void
     {
+        $this->enviarPdf(true);
+    }
+
+    public function preview(): void
+    {
+        $this->enviarPdf(false);
+    }
+
+    private function enviarPdf(bool $descargar): void
+    {
         $idDocumento = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
 
         if (!$idDocumento) {
@@ -171,7 +181,8 @@ class DocumentoController extends Controller{
 
         session_write_close();
         header('Content-Type: application/pdf');
-        header('Content-Disposition: attachment; filename="oficio-' . $idDocumento . '.pdf"');
+        $disposicion = $descargar ? 'attachment' : 'inline';
+        header('Content-Disposition: ' . $disposicion . '; filename="oficio-' . $idDocumento . '.pdf"');
         header('Content-Length: ' . fstat($archivo)['size']);
         fpassthru($archivo);
         fclose($archivo);

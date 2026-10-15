@@ -49,6 +49,12 @@ return [
         'methods' => ['POST'],
         'auth' => true,
     ],
+    'ver-pdf' => [
+        'controller' => DocumentoController::class,
+        'action' => 'preview',
+        'methods' => ['GET'],
+        'auth' => true,
+    ],
     'descargar-documento' => [
         'controller' => DocumentoController::class,
         'action' => 'download',

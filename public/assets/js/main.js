@@ -26,6 +26,34 @@
       estado.addEventListener("change", filtrar);
     }
 
+    var modalPdf = document.getElementById("pdf-modal");
+    if (modalPdf && typeof modalPdf.showModal === "function") {
+      var visorPdf = document.getElementById("pdf-modal-frame");
+      var abrirPdf = document.getElementById("pdf-modal-open");
+      document.querySelectorAll("[data-pdf-preview]").forEach(function (enlace) {
+        enlace.addEventListener("click", function (event) {
+          if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+          event.preventDefault();
+          visorPdf.src = enlace.href;
+          abrirPdf.href = enlace.href;
+          modalPdf.showModal();
+          document.body.classList.add("pdf-modal-open");
+        });
+      });
+      modalPdf.addEventListener("close", function () {
+        visorPdf.removeAttribute("src");
+        abrirPdf.removeAttribute("href");
+        document.body.classList.remove("pdf-modal-open");
+      });
+      modalPdf.addEventListener("click", function (event) {
+        if (event.target !== modalPdf) return;
+        var limites = modalPdf.getBoundingClientRect();
+        if (event.clientX < limites.left || event.clientX > limites.right || event.clientY < limites.top || event.clientY > limites.bottom) {
+          modalPdf.close();
+        }
+      });
+    }
+
     var formulario = document.getElementById("register-form");
     if (!formulario) return;
 
