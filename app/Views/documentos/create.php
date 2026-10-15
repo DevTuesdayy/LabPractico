@@ -8,7 +8,7 @@
                 <div>
                     <p class="eyebrow">REGISTRO</p>
                     <h1>Nuevo documento</h1>
-                    <p class="muted">Captura los datos del oficio y adjunta su archivo PDF.</p>
+                    <p class="muted">Captura los datos del oficio y adjunta un PDF o una foto del documento.</p>
                 </div>
             </div>
 
@@ -16,7 +16,7 @@
                 <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES, 'UTF-8') ?>">
 
                 <h2>Datos del documento</h2>
-                <p class="muted form-help">Todos los campos son obligatorios. El estado inicial será Recibido.</p>
+                <p class="muted form-help">Completa los campos y adjunta un PDF o una foto. El estado inicial será Recibido.</p>
                 <div class="form-grid form-grid-three">
                     <div class="field">
                         <label for="no_oficio">Número de oficio</label>
@@ -50,9 +50,17 @@
                 </div>
 
                 <div class="upload-box">
-                    <label for="archivo_pdf">Archivo PDF</label>
-                    <p class="muted" id="archivo-ayuda">Selecciona un PDF o arrástralo aquí. Máximo 25 MB.</p>
-                    <input type="file" id="archivo_pdf" name="archivo_pdf" accept=".pdf,application/pdf" aria-describedby="archivo-ayuda archivo-info" required>
+                    <label for="archivo_pdf">Documento adjunto</label>
+                    <p class="muted" id="archivo-ayuda">
+                        Selecciona un PDF o toma una foto. La foto se guardará como un PDF de una página. Máximo 25 MB por archivo.
+                    </p>
+                    <input type="file" id="archivo_pdf" name="archivo_pdf" accept=".pdf,application/pdf" aria-describedby="archivo-ayuda archivo-info">
+                    <div class="camera-actions">
+                        <button type="button" id="tomar-foto" class="button button-secondary">Tomar foto del documento</button>
+                        <button type="button" id="quitar-foto" class="button button-secondary" hidden>Quitar foto</button>
+                    </div>
+                    <input type="file" id="foto_documento" accept="image/*" capture="environment" aria-label="Fotografiar el documento" hidden>
+                    <img id="foto-preview" class="photo-preview" alt="Vista previa de la fotografía del documento" hidden>
                     <small class="file-info" id="archivo-info" aria-live="polite">Ningún archivo seleccionado.</small>
                 </div>
 

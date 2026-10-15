@@ -1,4 +1,4 @@
-/* Búsqueda de documentos y registro con PDF. */
+/* Búsqueda de documentos y registro con PDF o fotografía. */
 (function () {
   function iniciar() {
     var filas = Array.from(document.querySelectorAll("[data-documento]"));
@@ -35,6 +35,115 @@
     var aviso = document.getElementById("register-feedback");
     var boton = formulario.querySelector('button[type="submit"]');
 
+    var fotoInput = document.getElementById("foto_documento");
+    var botonCamara = document.getElementById("tomar-foto");
+    var fotoPreview = document.getElementById("foto-preview");
+    var quitarFoto = document.getElementById("quitar-foto");
+    var urlFoto = null;
+    var limiteArchivo = 25 * 1024 * 1024;
+
+    function limpiarFoto() {
+      fotoInput.value = "";
+      fotoPreview.hidden = true;
+      fotoPreview.removeAttribute("src");
+      quitarFoto.hidden = true;
+      botonCamara.textContent = "Tomar foto del documento";
+
+      if (urlFoto) {
+        URL.revokeObjectURL(urlFoto);
+        urlFoto = null;
+      }
+    }
+
+    function mostrarFoto() {
+      var foto = fotoInput.files[0];
+      if (!foto) return;
+
+      if (foto.size === 0 || foto.size > limiteArchivo || (foto.type && !foto.type.startsWith("image/"))) {
+        limpiarFoto();
+        mostrarArchivo();
+        resultado("Selecciona una fotografía con contenido y de hasta 25 MB.", false);
+        return;
+      }
+
+      archivoInput.value = "";
+      aviso.hidden = true;
+      if (urlFoto) URL.revokeObjectURL(urlFoto);
+      urlFoto = URL.createObjectURL(foto);
+      fotoPreview.src = urlFoto;
+      fotoPreview.hidden = false;
+      quitarFoto.hidden = false;
+      botonCamara.textContent = "Volver a tomar foto";
+      infoArchivo.textContent = foto.name + " · Se convertirá a PDF al guardar.";
+    }
+
+    botonCamara.addEventListener("click", function () {
+      fotoInput.click();
+    });
+    fotoInput.addEventListener("change", mostrarFoto);
+    quitarFoto.addEventListener("click", function () {
+      limpiarFoto();
+      mostrarArchivo();
+      aviso.hidden = true;
+    });
+    fotoPreview.addEventListener("error", function () {
+      if (fotoPreview.hidden) return;
+      limpiarFoto();
+      mostrarArchivo();
+      resultado("No se pudo leer la foto. Toma otra o utiliza una imagen JPG o PNG.", false);
+    });
+
+    async function convertirFotoAPdf(foto) {
+      if (!window.jspdf) {
+        throw new Error("No se pudo cargar el conversor a PDF. Revisa tu conexión e intenta nuevamente.");
+      }
+
+      var imagen = new Image();
+      var url = URL.createObjectURL(foto);
+
+      try {
+        imagen.src = url;
+        try {
+          await imagen.decode();
+        } catch (error) {
+          throw new Error("No se pudo leer la foto. Toma otra o utiliza una imagen JPG o PNG.");
+        }
+
+        if (!imagen.naturalWidth || !imagen.naturalHeight) {
+          throw new Error("La fotografía no tiene dimensiones válidas. Toma otra foto.");
+        }
+
+        var escala = Math.min(1, 2000 / Math.max(imagen.naturalWidth, imagen.naturalHeight));
+        var canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(imagen.naturalWidth * escala));
+        canvas.height = Math.max(1, Math.round(imagen.naturalHeight * escala));
+        var contexto = canvas.getContext("2d");
+
+        if (!contexto) throw new Error("No se pudo procesar la fotografía.");
+
+        contexto.fillStyle = "#ffffff";
+        contexto.fillRect(0, 0, canvas.width, canvas.height);
+        contexto.drawImage(imagen, 0, 0, canvas.width, canvas.height);
+
+        var pdf = new window.jspdf.jsPDF({
+          orientation: canvas.width > canvas.height ? "landscape" : "portrait",
+          unit: "mm",
+          format: "a4"
+        });
+        var anchoPagina = pdf.internal.pageSize.getWidth();
+        var altoPagina = pdf.internal.pageSize.getHeight();
+        var proporcion = Math.min((anchoPagina - 20) / canvas.width, (altoPagina - 20) / canvas.height);
+        var ancho = canvas.width * proporcion;
+        var alto = canvas.height * proporcion;
+
+        pdf.addImage(canvas.toDataURL("image/jpeg", 0.9), "JPEG", (anchoPagina - ancho) / 2, (altoPagina - alto) / 2, ancho, alto);
+
+        return new File([pdf.output("blob")], "foto-documento.pdf", { type: "application/pdf" });
+      } finally {
+        URL.revokeObjectURL(url);
+      }
+    }
+
     function mostrarArchivo() {
       var archivo = archivoInput.files[0];
       infoArchivo.textContent = archivo
@@ -56,7 +165,11 @@
       }
     }
 
-    archivoInput.addEventListener("change", mostrarArchivo);
+    archivoInput.addEventListener("change", function () {
+      limpiarFoto();
+      mostrarArchivo();
+      aviso.hidden = true;
+    });
     ["dragenter", "dragover"].forEach(function (evento) {
       zonaArchivo.addEventListener(evento, function (event) {
         event.preventDefault();
@@ -70,9 +183,20 @@
       });
     });
     zonaArchivo.addEventListener("drop", function (event) {
-      if (event.dataTransfer.files.length) {
+      if (boton.disabled || !event.dataTransfer.files.length) return;
+      if (event.dataTransfer.files.length !== 1) {
+        resultado("Adjunta un solo PDF o una foto por documento.", false);
+        return;
+      }
+
+      if (event.dataTransfer.files[0].type.startsWith("image/")) {
+        fotoInput.files = event.dataTransfer.files;
+        mostrarFoto();
+      } else {
+        limpiarFoto();
         archivoInput.files = event.dataTransfer.files;
         mostrarArchivo();
+        aviso.hidden = true;
       }
     });
 
@@ -81,19 +205,45 @@
       if (boton.disabled || !formulario.reportValidity()) return;
 
       var archivo = archivoInput.files[0];
-      if (!archivo || archivo.size === 0 || archivo.size > 25 * 1024 * 1024) {
-        resultado("Selecciona un PDF con contenido y de hasta 25 MB.", false);
+      var foto = fotoInput.files[0];
+      if (!archivo && !foto) {
+        resultado("Selecciona un PDF o toma una foto del documento.", false);
         return;
       }
 
+      var datosEnvio = new FormData(formulario);
       boton.disabled = true;
-      boton.textContent = "Guardando…";
+      botonCamara.disabled = true;
+      quitarFoto.disabled = true;
+      archivoInput.disabled = true;
+      fotoInput.disabled = true;
+      boton.textContent = foto ? "Preparando PDF…" : "Guardando…";
 
       try {
+        if (foto) {
+          if (foto.size === 0 || foto.size > limiteArchivo) {
+            resultado("La fotografía debe tener contenido y pesar como máximo 25 MB.", false);
+            return;
+          }
+          try {
+            archivo = await convertirFotoAPdf(foto);
+          } catch (error) {
+            resultado(error.message, false);
+            return;
+          }
+        }
+
+        if (archivo.size === 0 || archivo.size > limiteArchivo) {
+          resultado("El PDF debe tener contenido y pesar como máximo 25 MB.", false);
+          return;
+        }
+
+        datosEnvio.set("archivo_pdf", archivo, archivo.name);
+        boton.textContent = "Guardando…";
         var respuesta = await fetch(formulario.action, {
           method: "POST",
           headers: { Accept: "application/json" },
-          body: new FormData(formulario)
+          body: datosEnvio
         });
         var datos = await respuesta.json();
 
@@ -103,12 +253,17 @@
         }
 
         formulario.reset();
+        limpiarFoto();
         mostrarArchivo();
         resultado(datos.mensaje, true, datos.id_documento);
       } catch (error) {
         resultado("No se pudo completar el envío. Intenta nuevamente.", false);
       } finally {
         boton.disabled = false;
+        botonCamara.disabled = false;
+        quitarFoto.disabled = false;
+        archivoInput.disabled = false;
+        fotoInput.disabled = false;
         boton.textContent = "Guardar documento";
       }
     });

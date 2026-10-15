@@ -1,7 +1,7 @@
 # LabPractico — DocuFlow
 
 Aplicación de gestión documental en PHP y MySQL. La estructura prepara MVC sin
-framework. Incluye inicio de sesión, registro de documentos con PDF, bandeja
+framework. Incluye inicio de sesión, registro de documentos con PDF o foto, bandeja
 con datos reales, consulta de detalle, cambio de estado con historial y descarga
 del archivo adjunto. El login
 usa cuentas de MySQL, contraseñas con hash y sesiones de PHP.
@@ -123,6 +123,26 @@ El formulario envía los datos mediante JavaScript y muestra una confirmación
 con enlace al documento guardado. La bandeja permite buscar y filtrar por los
 estados reales entre los registros cargados. En pantallas pequeñas las filas
 se presentan como tarjetas y mantienen visible el acceso al detalle.
+
+## Registro con cámara
+
+El registro permite seleccionar un PDF o usar «Tomar foto del documento». El
+campo de foto solicita la cámara trasera mediante `capture="environment"`;
+el navegador móvil decide si abre la cámara o un selector. En computadora
+normalmente permite elegir una imagen.
+
+La foto tiene una vista previa y se puede quitar o repetir. Al guardar,
+JavaScript reduce las imágenes grandes a un máximo de 2000 píxeles en su lado
+mayor y crea un PDF A4 de una página, con márgenes y sin deformar la imagen.
+Se utiliza jsPDF 4.2.1 desde CDN, solo en la pantalla de registro. La conversión
+requiere que esa biblioteca pueda cargarse. Si el navegador no reconoce la
+imagen, se muestra un error y se puede elegir otra foto o un PDF.
+
+El PDF generado se envía como `archivo_pdf` a la misma ruta existente. El
+backend sigue validando y guardando PDFs; no cambia la estructura de MySQL.
+Las fotos y los PDFs seleccionados admiten hasta 25 MB. Un PDF ya seleccionado
+se envía directamente, sin convertirlo. Para probar la cámara en un teléfono,
+la aplicación debe estar disponible en una dirección accesible desde él.
 
 ## Descarga del PDF
 

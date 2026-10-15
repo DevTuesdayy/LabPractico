@@ -20,6 +20,9 @@ $asset = static function (string $ruta): string {
     <?php endforeach; ?>
     <?php if ($cargarScripts): ?>
         <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+        <?php if ($claseBody === 'register-page'): ?>
+            <script src="https://cdn.jsdelivr.net/npm/jspdf@4.2.1/dist/jspdf.umd.min.js" defer></script>
+        <?php endif; ?>
         <script src="<?= $asset('assets/js/main.js') ?>" defer></script>
     <?php endif; ?>
 </head>
