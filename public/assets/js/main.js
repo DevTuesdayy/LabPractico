@@ -4,15 +4,26 @@
     var filas = Array.from(document.querySelectorAll("[data-documento]"));
     var buscador = document.getElementById("search-documentos");
     var estado = document.getElementById("estado-documentos");
+    var desde = document.getElementById("fecha-desde");
+    var hasta = document.getElementById("fecha-hasta");
+    var errorFechas = document.getElementById("fechas-error");
+    var limpiarFiltros = document.getElementById("limpiar-filtros");
 
     function filtrar() {
       var texto = buscador.value.toLowerCase().trim();
       var visibles = 0;
+      var rangoInvalido = Boolean(desde.value && hasta.value && desde.value > hasta.value);
+      errorFechas.hidden = !rangoInvalido;
+      hasta.setAttribute("aria-invalid", rangoInvalido ? "true" : "false");
 
       filas.forEach(function (fila) {
         var coincide = fila.textContent.toLowerCase().includes(texto);
         var coincideEstado = !estado.value || fila.dataset.estado === estado.value;
-        fila.hidden = !(coincide && coincideEstado);
+        // Las fechas AAAA-MM-DD se pueden comparar directamente, incluyendo ambos límites.
+        var coincideFecha = !rangoInvalido &&
+          (!desde.value || fila.dataset.fecha >= desde.value) &&
+          (!hasta.value || fila.dataset.fecha <= hasta.value);
+        fila.hidden = !(coincide && coincideEstado && coincideFecha);
         if (!fila.hidden) visibles++;
       });
 
@@ -21,9 +32,18 @@
         "Mostrando " + visibles + " de " + filas.length + " documentos";
     }
 
-    if (buscador && estado) {
+    if (buscador && estado && desde && hasta && errorFechas && limpiarFiltros) {
       buscador.addEventListener("input", filtrar);
       estado.addEventListener("change", filtrar);
+      desde.addEventListener("change", filtrar);
+      hasta.addEventListener("change", filtrar);
+      limpiarFiltros.addEventListener("click", function () {
+        buscador.value = "";
+        estado.value = "";
+        desde.value = "";
+        hasta.value = "";
+        filtrar();
+      });
     }
 
     var modalPdf = document.getElementById("pdf-modal");

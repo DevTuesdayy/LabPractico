@@ -48,6 +48,8 @@ Rutas actuales:
 - `index.php?page=registrar-documento`: vista de registro.
 - `index.php?page=guardar-documento`: POST registra documento y PDF.
 - `index.php?page=detalle-documento&id=1`: detalle de un documento existente.
+- `index.php?page=editar-documento&id=1`: GET muestra el formulario; POST actualiza los datos del oficio.
+- `index.php?page=eliminar-documento&id=1`: GET solicita confirmación; POST elimina el documento.
 - `index.php?page=actualizar-estado`: POST cambia el estado y registra el movimiento.
 - `index.php?page=descargar-documento&id=1`: GET descarga su PDF con sesión iniciada.
 - `index.php?page=login`: GET muestra el formulario; POST valida las credenciales.
@@ -124,6 +126,12 @@ con enlace al documento guardado. La bandeja permite buscar y filtrar por los
 estados reales entre los registros cargados. En pantallas pequeñas las filas
 se presentan como tarjetas y mantienen visible el acceso al detalle.
 
+Los filtros **Recepción desde** y **Recepción hasta** limitan la bandeja por fecha
+de recepción, incluyendo ambos días. Se pueden usar juntos o con un solo límite,
+y se combinan con el texto y el estado. Los resultados se actualizan al cambiar
+los filtros, sobre los documentos cargados. Un rango invertido muestra un aviso;
+**Limpiar filtros** restablece la bandeja completa.
+
 ## Registro con cámara
 
 El registro permite seleccionar un PDF o usar «Tomar foto del documento». El
@@ -164,6 +172,22 @@ Guardar el estado actual no genera movimientos repetidos. El historial del
 detalle muestra estado, usuario y fecha, comenzando por el movimiento más
 reciente. Tras guardar se recarga el detalle con una confirmación; la bandeja
 y sus conteos reflejan el estado nuevo al abrirla.
+
+## Editar y eliminar documentos
+
+Desde **Documentos → Ver detalle**, el botón **Editar datos** permite corregir el
+número de oficio, las dos fechas, el asunto, el remitente y el destinatario.
+La edición conserva el PDF, el usuario que registró el oficio y su historial de
+estados. El cambio de estado sigue realizándose desde su selector en el detalle.
+Los datos se validan en PHP; si hay un error, el formulario conserva lo escrito.
+
+**Eliminar documento** abre una pantalla con el oficio y su asunto para confirmar
+o cancelar. Solo el POST de confirmación elimina el registro y su historial
+(mediante la clave foránea `ON DELETE CASCADE`), y después retira el PDF de
+`storage/documentos`. No hay papelera: la eliminación es definitiva.
+Si el PDF ya no existe, se permite eliminar el registro. Si falla su retirada del
+servidor, se muestra un aviso para revisar el almacenamiento. Ambas operaciones
+requieren sesión y sus formularios POST validan un token CSRF.
 
 Se retiraron los controles de demostración de OCR, escaneo, prioridades,
 borradores, turnados, reportes y acciones masivas, junto con las cifras y el

@@ -43,6 +43,18 @@ return [
         'methods' => ['GET'],
         'auth' => true,
     ],
+    'editar-documento' => [
+        'controller' => DocumentoController::class,
+        'action' => 'edit',
+        'methods' => ['GET', 'POST'],
+        'auth' => true,
+    ],
+    'eliminar-documento' => [
+        'controller' => DocumentoController::class,
+        'action' => 'delete',
+        'methods' => ['GET', 'POST'],
+        'auth' => true,
+    ],
     'actualizar-estado' => [
         'controller' => DocumentoController::class,
         'action' => 'updateStatus',

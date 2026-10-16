@@ -17,15 +17,18 @@ $clasesEstado = ['Recibido' => 'received', 'En proceso' => 'in-progress', 'Atend
                 <span class="status <?= $clasesEstado[$documento['estado']] ?? 'received' ?>"><?= $escapar($documento['estado']) ?></span>
             </div>
 
-            <?php if ($datos['mensajeEstado'] !== null): ?>
-                <div class="form-feedback state-feedback <?= $escapar($datos['mensajeEstado']['tipo']) ?>" role="<?= $datos['mensajeEstado']['tipo'] === 'error' ? 'alert' : 'status' ?>">
-                    <?= $escapar($datos['mensajeEstado']['mensaje']) ?>
+            <?php if ($datos['mensajeDocumento'] !== null): ?>
+                <div class="form-feedback state-feedback <?= $escapar($datos['mensajeDocumento']['tipo']) ?>" role="<?= $datos['mensajeDocumento']['tipo'] === 'error' ? 'alert' : 'status' ?>">
+                    <?= $escapar($datos['mensajeDocumento']['mensaje']) ?>
                 </div>
             <?php endif; ?>
 
             <div class="detail-layout">
                 <section class="panel detail-card" aria-labelledby="detalle-title">
-                    <h2 id="detalle-title">Información del documento</h2>
+                    <div class="detail-card-heading">
+                        <h2 id="detalle-title">Información del documento</h2>
+                        <a class="button button-secondary button-small" href="index.php?page=editar-documento&amp;id=<?= (int) $documento['id_documento'] ?>">Editar datos</a>
+                    </div>
                     <dl class="detail-fields">
                         <div><dt>Número de oficio</dt><dd><?= $escapar($documento['no_oficio']) ?></dd></div>
                         <div><dt>Fecha de emisión</dt><dd><?= $escapar($documento['fecha_emision']) ?></dd></div>
@@ -65,6 +68,11 @@ $clasesEstado = ['Recibido' => 'received', 'En proceso' => 'in-progress', 'Atend
                         </div>
                         <button type="submit" class="button">Guardar estado</button>
                     </form>
+                </section>
+                <section class="panel detail-card" aria-labelledby="eliminar-title">
+                    <h2 id="eliminar-title">Eliminar documento</h2>
+                    <p class="muted file-title">Elimina este registro, su historial y el PDF adjunto.</p>
+                    <a class="button button-danger download-button" href="index.php?page=eliminar-documento&amp;id=<?= (int) $documento['id_documento'] ?>">Eliminar documento</a>
                 </section>
                 </div>
             </div>

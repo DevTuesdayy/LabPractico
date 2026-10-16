@@ -191,6 +191,34 @@ class Documento{
         }
     }
 
+    public function actualizar(int $idDocumento, array $datos): void
+    {
+        $consulta = $this->conexion->prepare(
+            'UPDATE documentos SET no_oficio = :no_oficio,
+             fecha_emision = :fecha_emision, fecha_recepcion = :fecha_recepcion,
+             asunto = :asunto, remitente = :remitente, destinatario = :destinatario
+             WHERE id_documento = :id_documento'
+        );
+        $consulta->execute([
+            'no_oficio' => $datos['no_oficio'],
+            'fecha_emision' => $datos['fecha_emision'],
+            'fecha_recepcion' => $datos['fecha_recepcion'],
+            'asunto' => $datos['asunto'],
+            'remitente' => $datos['remitente'],
+            'destinatario' => $datos['destinatario'],
+            'id_documento' => $idDocumento,
+        ]);
+    }
+
+    public function eliminar(int $idDocumento): bool
+    {
+        // La clave foránea elimina el historial asociado en la misma operación.
+        $consulta = $this->conexion->prepare('DELETE FROM documentos WHERE id_documento = :id_documento');
+        $consulta->execute(['id_documento' => $idDocumento]);
+
+        return $consulta->rowCount() === 1;
+    }
+
     public function buscarPorId(int $idDocumento): ?array{
         $consulta = $this->conexion->prepare(
             'SELECT d.*,

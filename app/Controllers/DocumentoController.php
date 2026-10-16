@@ -11,6 +11,8 @@ class DocumentoController extends Controller{
     public function index(): void{
 
         $documentos = $this->documentoModel->listar();
+        $mensaje = $_SESSION['listado_mensaje'] ?? null;
+        unset($_SESSION['listado_mensaje']);
 
         $resumen = [
             'total' => count($documentos),
@@ -39,7 +41,7 @@ class DocumentoController extends Controller{
             'dashboard-page',
             [],
             true,
-            ['documentos' => $documentos, 'resumen' => $resumen]
+            ['documentos' => $documentos, 'resumen' => $resumen, 'mensaje' => $mensaje]
         );
     }
 
@@ -72,8 +74,8 @@ class DocumentoController extends Controller{
         }
 
         $rutaPdf = $this->rutaPdf($documento);
-        $mensajeEstado = $_SESSION['estado_mensaje'][$idDocumento] ?? null;
-        unset($_SESSION['estado_mensaje'][$idDocumento]);
+        $mensajeDocumento = $_SESSION['documento_mensaje'][$idDocumento] ?? null;
+        unset($_SESSION['documento_mensaje'][$idDocumento]);
 
         $this->render(
             'documentos/show',
@@ -87,9 +89,128 @@ class DocumentoController extends Controller{
                 'archivoTamano' => $rutaPdf !== null ? filesize($rutaPdf) : 0,
                 'estatus' => $this->documentoModel->obtenerEstatus(),
                 'historial' => $this->documentoModel->obtenerHistorial($idDocumento),
-                'mensajeEstado' => $mensajeEstado,
+                'mensajeDocumento' => $mensajeDocumento,
             ]
         );
+    }
+
+    public function edit(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$this->validarFormulario()) {
+            return;
+        }
+
+        $documento = $this->documentoSolicitado();
+        if ($documento === null) {
+            return;
+        }
+
+        $error = null;
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            try {
+                $datos = $this->validarDatos($_POST);
+                $this->documentoModel->actualizar((int) $documento['id_documento'], $datos);
+                $_SESSION['documento_mensaje'][$documento['id_documento']] = [
+                    'tipo' => 'success', 'mensaje' => 'Datos del documento actualizados correctamente.',
+                ];
+                header('Location: index.php?page=detalle-documento&id=' . $documento['id_documento'], true, 303);
+                return;
+            } catch (InvalidArgumentException $e) {
+                http_response_code(422);
+                $error = $e->getMessage();
+            } catch (PDOException $e) {
+                if ((int) ($e->errorInfo[1] ?? 0) === 1062) {
+                    http_response_code(409);
+                    $error = 'Ya existe un documento con ese número de oficio.';
+                } else {
+                    error_log('No se pudieron actualizar los datos del documento.');
+                    http_response_code(500);
+                    $error = 'No se pudo guardar el cambio. Intenta nuevamente.';
+                }
+            }
+
+            // Conservar lo escrito si hay errores, sin aceptar campos ajenos al formulario.
+            foreach (['no_oficio', 'fecha_emision', 'fecha_recepcion', 'asunto', 'remitente', 'destinatario'] as $campo) {
+                $documento[$campo] = is_string($_POST[$campo] ?? null) ? $_POST[$campo] : '';
+            }
+        }
+
+        $this->render('documentos/edit', 'Editar documento | DocuFlow', 'dashboard-page', [], true, [
+            'documento' => $documento, 'error' => $error,
+        ]);
+    }
+
+    public function delete(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && !$this->validarFormulario()) {
+            return;
+        }
+
+        $documento = $this->documentoSolicitado();
+        if ($documento === null) {
+            return;
+        }
+
+        $error = null;
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $rutaPdf = $this->rutaPdf($documento);
+
+            try {
+                if (!$this->documentoModel->eliminar((int) $documento['id_documento'])) {
+                    http_response_code(404);
+                    echo 'El documento ya no existe.';
+                    return;
+                }
+            } catch (PDOException $e) {
+                error_log('No se pudo eliminar el documento.');
+                http_response_code(500);
+                $error = 'No se pudo eliminar el documento. Intenta nuevamente.';
+            }
+
+            if ($error === null) {
+                $mensaje = ['tipo' => 'success', 'mensaje' => 'Documento eliminado correctamente.'];
+                if ($rutaPdf !== null && !unlink($rutaPdf)) {
+                    error_log('Se eliminó el registro, pero no se pudo retirar su PDF.');
+                    $mensaje = ['tipo' => 'error', 'mensaje' => 'El registro se eliminó, pero no se pudo retirar su PDF del servidor. Revisa los permisos de almacenamiento.'];
+                }
+                unset($_SESSION['documento_mensaje'][$documento['id_documento']]);
+                $_SESSION['listado_mensaje'] = $mensaje;
+                header('Location: index.php?page=documentos', true, 303);
+                return;
+            }
+        }
+
+        $this->render('documentos/delete', 'Eliminar documento | DocuFlow', 'dashboard-page', [], true, [
+            'documento' => $documento, 'error' => $error,
+        ]);
+    }
+
+    private function documentoSolicitado(): ?array
+    {
+        $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+        if (!$id) {
+            http_response_code(400);
+            echo 'El identificador del documento no es válido.';
+            return null;
+        }
+
+        $documento = $this->documentoModel->buscarPorId($id);
+        if ($documento === null) {
+            http_response_code(404);
+            echo 'El documento no existe.';
+        }
+        return $documento;
+    }
+
+    private function validarFormulario(): bool
+    {
+        $token = $_POST['csrf_token'] ?? '';
+        if (!is_string($token) || $token === '' || !hash_equals($_SESSION['csrf_token'] ?? '', $token)) {
+            http_response_code(403);
+            echo 'Formulario inválido. Recarga la página e intenta nuevamente.';
+            return false;
+        }
+        return true;
     }
 
     public function updateStatus(): void
@@ -138,7 +259,7 @@ class DocumentoController extends Controller{
             $tipo = 'error';
         }
 
-        $_SESSION['estado_mensaje'][$idDocumento] = ['tipo' => $tipo, 'mensaje' => $mensaje];
+        $_SESSION['documento_mensaje'][$idDocumento] = ['tipo' => $tipo, 'mensaje' => $mensaje];
         header('Location: index.php?page=detalle-documento&id=' . $idDocumento, true, 303);
     }
 
@@ -224,28 +345,7 @@ class DocumentoController extends Controller{
         $registroCompleto = false;
 
         try {
-            $datos = [];
-
-            foreach (['no_oficio' => 50, 'asunto' => 255, 'remitente' => 150, 'destinatario' => 150] as $campo => $limite) {
-                $valor = $_POST[$campo] ?? '';
-
-                if (!is_string($valor) || trim($valor) === '' || mb_strlen(trim($valor)) > $limite) {
-                    throw new InvalidArgumentException("Revisa $campo: es obligatorio y admite hasta $limite caracteres.");
-                }
-
-                $datos[$campo] = trim($valor);
-            }
-
-            foreach (['fecha_emision', 'fecha_recepcion'] as $campo) {
-                $valor = $_POST[$campo] ?? '';
-                $fecha = is_string($valor) ? DateTimeImmutable::createFromFormat('!Y-m-d', $valor) : false;
-
-                if (!$fecha || $fecha->format('Y-m-d') !== $valor) {
-                    throw new InvalidArgumentException("Revisa $campo: debe ser una fecha válida.");
-                }
-
-                $datos[$campo] = $valor;
-            }
+            $datos = $this->validarDatos($_POST);
 
             $archivo = $_FILES['archivo_pdf'] ?? [];
 
@@ -304,6 +404,34 @@ class DocumentoController extends Controller{
                 error_log('No se pudo retirar el PDF de un registro fallido.');
             }
         }
+    }
+
+    private function validarDatos(array $entrada): array
+    {
+        $datos = [];
+
+        foreach (['no_oficio' => 50, 'asunto' => 255, 'remitente' => 150, 'destinatario' => 150] as $campo => $limite) {
+            $valor = $entrada[$campo] ?? '';
+
+            if (!is_string($valor) || trim($valor) === '' || mb_strlen(trim($valor)) > $limite) {
+                throw new InvalidArgumentException("Revisa $campo: es obligatorio y admite hasta $limite caracteres.");
+            }
+
+            $datos[$campo] = trim($valor);
+        }
+
+        foreach (['fecha_emision', 'fecha_recepcion'] as $campo) {
+            $valor = $entrada[$campo] ?? '';
+            $fecha = is_string($valor) ? DateTimeImmutable::createFromFormat('!Y-m-d', $valor) : false;
+
+            if (!$fecha || $fecha->format('Y-m-d') !== $valor) {
+                throw new InvalidArgumentException("Revisa $campo: debe ser una fecha válida.");
+            }
+
+            $datos[$campo] = $valor;
+        }
+
+        return $datos;
     }
 
     private function responderRegistro(int $estado, string $mensaje, ?int $idDocumento = null): void

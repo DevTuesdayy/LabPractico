@@ -18,6 +18,12 @@ $escapar = fn($valor) => htmlspecialchars((string) $valor, ENT_QUOTES, 'UTF-8');
                 <a class="button" href="index.php?page=registrar-documento">+ Nuevo documento</a>
             </div>
 
+            <?php if ($datos['mensaje'] !== null): ?>
+                <div class="form-feedback state-feedback <?= $escapar($datos['mensaje']['tipo']) ?>" role="<?= $datos['mensaje']['tipo'] === 'error' ? 'alert' : 'status' ?>">
+                    <?= $escapar($datos['mensaje']['mensaje']) ?>
+                </div>
+            <?php endif; ?>
+
             <section class="summary-cards" aria-label="Resumen de documentos">
                 <?php foreach (['total' => 'Total', 'recibidos' => 'Recibidos', 'en_proceso' => 'En proceso', 'atendidos' => 'Atendidos'] as $clave => $etiqueta): ?>
                     <article class="summary-card">
@@ -46,6 +52,18 @@ $escapar = fn($valor) => htmlspecialchars((string) $valor, ENT_QUOTES, 'UTF-8');
                             <option>Atendido</option>
                         </select>
                     </div>
+                    <div class="field">
+                        <label for="fecha-desde">Recepción desde</label>
+                        <input type="date" id="fecha-desde" aria-describedby="fechas-error">
+                    </div>
+                    <div class="field">
+                        <label for="fecha-hasta">Recepción hasta</label>
+                        <input type="date" id="fecha-hasta" aria-describedby="fechas-error">
+                    </div>
+                    <p id="fechas-error" class="filter-date-error" role="alert" hidden>La fecha Desde no puede ser posterior a la fecha Hasta.</p>
+                    <div class="filter-actions">
+                        <button type="button" class="button button-secondary button-small" id="limpiar-filtros">Limpiar filtros</button>
+                    </div>
                 </div>
 
                 <table class="documents-table">
@@ -61,7 +79,7 @@ $escapar = fn($valor) => htmlspecialchars((string) $valor, ENT_QUOTES, 'UTF-8');
                     </thead>
                     <tbody>
                         <?php foreach ($documentos as $documento): ?>
-                            <tr data-documento data-estado="<?= $escapar($documento['estado']) ?>">
+                            <tr data-documento data-estado="<?= $escapar($documento['estado']) ?>" data-fecha="<?= $escapar($documento['fecha_recepcion']) ?>">
                                 <td data-label="Documento" class="document-main-cell">
                                     <span class="office-number"><?= $escapar($documento['no_oficio']) ?></span>
                                     <strong class="document-subject"><?= $escapar($documento['asunto']) ?></strong>

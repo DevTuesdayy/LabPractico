@@ -9,7 +9,7 @@
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg>
             <span>Inicio</span>
         </a>
-        <a class="navigation-link" href="index.php?page=documentos" <?= in_array($paginaActual, ['documentos', 'detalle-documento'], true) ? 'aria-current="page"' : '' ?>>
+        <a class="navigation-link" href="index.php?page=documentos" <?= in_array($paginaActual, ['documentos', 'detalle-documento', 'editar-documento', 'eliminar-documento'], true) ? 'aria-current="page"' : '' ?>>
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 11h18"/></svg>
             <span>Documentos</span>
         </a>

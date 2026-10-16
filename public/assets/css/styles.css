@@ -64,6 +64,9 @@ h2 { margin-bottom: 0; font-size: 17px; font-weight: 700; }
 .button:hover { background: #4937be; color: #fff; }
 .button-secondary { border-color: #dedbea; background: #fff; color: var(--violet); box-shadow: none; }
 .button-secondary:hover { background: var(--soft); color: var(--violet); }
+.button-danger { border-color: #ebc5cb; background: #fff1f2; color: #96323e; box-shadow: none; }
+.button-danger:hover { border-color: #dca1ab; background: #fce3e7; color: #822332; }
+.detail-card-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
 .button-small { padding: 9px 10px; font-size: 12px; }
 .button:disabled { opacity: .6; cursor: wait; }
 .back-link { display: inline-block; margin-bottom: 22px; font-size: 13px; font-weight: 650; text-decoration: none; }
@@ -78,7 +81,9 @@ h2 { margin-bottom: 0; font-size: 17px; font-weight: 700; }
 .panel { min-width: 0; border: 1px solid var(--line); border-radius: 14px; background: #fff; box-shadow: var(--shadow); }
 .panel-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; padding: 22px 22px 0; }
 .panel-heading .muted { padding: 4px 9px; border-radius: 6px; background: #f5f6fa; font-size: 11px; font-weight: 500; }
-.document-filters { display: grid; grid-template-columns: minmax(0, 1fr) 190px; gap: 16px; margin: 22px; padding: 18px; border: 1px solid #ebedf3; border-radius: 10px; background: #fafbfe; }
+.document-filters { display: grid; grid-template-columns: minmax(0, 2fr) repeat(3, minmax(0, 1fr)); gap: 16px; margin: 22px; padding: 18px; border: 1px solid #ebedf3; border-radius: 10px; background: #fafbfe; }
+.filter-actions { grid-column: 1 / -1; display: flex; justify-content: flex-end; }
+.filter-date-error { grid-column: 1 / -1; margin: 0; color: #96323e; font-size: 13px; }
 .field { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
 .field label, .upload-box > label { color: #4d5168; font-size: 12px; font-weight: 700; }
 .field input, .field select, .field textarea {
@@ -169,6 +174,9 @@ h2 { margin-bottom: 0; font-size: 17px; font-weight: 700; }
 .home-link h2 { margin-bottom: 12px; }
 .home-link p { line-height: 1.7; }
 .link-label { color: var(--violet); font-size: 13px; font-weight: 700; }
+@media (max-width: 1200px) {
+    .document-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 @media (max-width: 1050px) {
     .sidebar { position: static; width: 100%; padding: 18px 24px; border-right: 0; border-bottom: 1px solid var(--line); }
     .sidebar-brand { margin-bottom: 18px; }
