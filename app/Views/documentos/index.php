@@ -1,0 +1,117 @@
+<?php
+$documentos = $datos['documentos'];
+$resumen = $datos['resumen'];
+$clasesEstado = ['Recibido' => 'received', 'En proceso' => 'in-progress', 'Atendido' => 'attended'];
+$escapar = fn($valor) => htmlspecialchars((string) $valor, ENT_QUOTES, 'UTF-8');
+?>
+<div class="app-shell">
+    <?php require __DIR__ . '/../partials/sidebar.php'; ?>
+    <div class="app-main">
+        <?php require __DIR__ . '/../partials/header.php'; ?>
+        <main class="page-content" id="documentos">
+            <div class="page-heading">
+                <div>
+                    <p class="eyebrow">TU OFICINA, ORGANIZADA</p>
+                    <h1>Documentos</h1>
+                    <p class="muted">Consulta los oficios recibidos y abre sus datos y archivos adjuntos.</p>
+                </div>
+                <a class="button" href="index.php?page=registrar-documento">+ Nuevo documento</a>
+            </div>
+
+            <?php if ($datos['mensaje'] !== null): ?>
+                <div class="form-feedback state-feedback <?= $escapar($datos['mensaje']['tipo']) ?>" role="<?= $datos['mensaje']['tipo'] === 'error' ? 'alert' : 'status' ?>">
+                    <?= $escapar($datos['mensaje']['mensaje']) ?>
+                </div>
+            <?php endif; ?>
+
+            <section class="summary-cards" aria-label="Resumen de documentos">
+                <?php foreach (['total' => 'Total', 'recibidos' => 'Recibidos', 'en_proceso' => 'En proceso', 'atendidos' => 'Atendidos'] as $clave => $etiqueta): ?>
+                    <article class="summary-card">
+                        <h2><?= $etiqueta ?></h2>
+                        <strong><?= (int) $resumen[$clave] ?></strong>
+                    </article>
+                <?php endforeach; ?>
+            </section>
+
+            <section class="panel" aria-labelledby="listado-title">
+                <div class="panel-heading">
+                    <h2 id="listado-title">Bandeja de documentos</h2>
+                    <span class="muted"><?= count($documentos) ?> registrados</span>
+                </div>
+                <div class="document-filters" id="buscador">
+                    <div class="field">
+                        <label for="search-documentos">Buscar documento</label>
+                        <input type="search" id="search-documentos" placeholder="Oficio, asunto, remitente o destino">
+                    </div>
+                    <div class="field">
+                        <label for="estado-documentos">Estado</label>
+                        <select id="estado-documentos">
+                            <option value="">Todos los estados</option>
+                            <option>Recibido</option>
+                            <option>En proceso</option>
+                            <option>Atendido</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <label for="fecha-desde">Recepción desde</label>
+                        <input type="date" id="fecha-desde" aria-describedby="fechas-error">
+                    </div>
+                    <div class="field">
+                        <label for="fecha-hasta">Recepción hasta</label>
+                        <input type="date" id="fecha-hasta" aria-describedby="fechas-error">
+                    </div>
+                    <p id="fechas-error" class="filter-date-error" role="alert" hidden>La fecha Desde no puede ser posterior a la fecha Hasta.</p>
+                    <div class="filter-actions">
+                        <button type="button" class="button button-secondary button-small" id="limpiar-filtros">Limpiar filtros</button>
+                    </div>
+                </div>
+
+                <table class="documents-table">
+                    <caption class="visually-hidden">Documentos recibidos y acceso a su detalle</caption>
+                    <thead>
+                        <tr>
+                            <th scope="col">Documento</th>
+                            <th scope="col">Origen y destino</th>
+                            <th scope="col">Recepción</th>
+                            <th scope="col">Estado</th>
+                            <th scope="col">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($documentos as $documento): ?>
+                            <tr data-documento data-estado="<?= $escapar($documento['estado']) ?>" data-fecha="<?= $escapar($documento['fecha_recepcion']) ?>">
+                                <td data-label="Documento" class="document-main-cell">
+                                    <span class="office-number"><?= $escapar($documento['no_oficio']) ?></span>
+                                    <strong class="document-subject"><?= $escapar($documento['asunto']) ?></strong>
+                                </td>
+                                <td data-label="Origen y destino">
+                                    <span class="cell-line"><span class="cell-caption">De:</span> <?= $escapar($documento['remitente']) ?></span>
+                                    <span class="cell-line"><span class="cell-caption">Para:</span> <?= $escapar($documento['destinatario']) ?></span>
+                                </td>
+                                <td data-label="Recepción">
+                                    <time datetime="<?= $escapar($documento['fecha_recepcion']) ?>"><?= $escapar($documento['fecha_recepcion']) ?></time>
+                                </td>
+                                <td data-label="Estado">
+                                    <span class="status <?= $clasesEstado[$documento['estado']] ?? 'received' ?>"><?= $escapar($documento['estado']) ?></span>
+                                </td>
+                                <td data-label="Acciones" class="document-action-cell">
+                                    <div class="document-actions">
+                                    <a class="button button-secondary button-small" href="index.php?page=detalle-documento&amp;id=<?= (int) $documento['id_documento'] ?>" aria-label="Ver detalle del oficio <?= $escapar($documento['no_oficio']) ?>">Ver detalle</a>
+                                    <a class="button button-secondary preview-eye" data-pdf-preview href="index.php?page=ver-pdf&amp;id=<?= (int) $documento['id_documento'] ?>" target="_blank" rel="noopener" title="Vista previa del PDF" aria-label="Vista previa del PDF del oficio <?= $escapar($documento['no_oficio']) ?>">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+                                    </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                        <tr id="sin-resultados" <?= count($documentos) > 0 ? 'hidden' : '' ?>>
+                            <td colspan="5" class="empty-state"><?= empty($documentos) ? 'Todavía no hay documentos. Registra el primero para comenzar.' : 'No hay documentos que coincidan con la búsqueda.' ?></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="documents-footer" id="documentos-count" aria-live="polite">Mostrando <?= count($documentos) ?> de <?= count($documentos) ?> documentos</p>
+            </section>
+        </main>
+    </div>
+</div>
+<?php require __DIR__ . '/../partials/pdf-preview.php'; ?>

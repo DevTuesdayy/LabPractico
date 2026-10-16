@@ -1,0 +1,61 @@
+.login-page {
+    margin: 0;
+    background: #fafbfe;
+    color: #24243b;
+    font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+.login-page * { box-sizing: border-box; }
+.login-shell { display: grid; grid-template-columns: 1fr 1fr; min-height: 100vh; }
+.login-intro {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 48px clamp(28px, 6vw, 90px);
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: radial-gradient(ellipse at bottom left, #7865d9 0%, transparent 65%), #352866;
+    color: #fff;
+}
+.login-intro::after { content: ""; position: absolute; z-index: -1; width: 430px; height: 430px; right: -170px; bottom: -180px; border: 1px solid #ffffff18; border-radius: 50%; box-shadow: 0 0 0 65px #ffffff04, 0 0 0 130px #ffffff03; pointer-events: none; }
+.login-brand { display: flex; align-items: center; gap: 13px; color: #fff; text-decoration: none; font-size: 25px; font-weight: 800; }
+.login-brand small { display: block; margin-top: 3px; font-size: 10px; letter-spacing: .16em; color: #ddd7ff; }
+.login-brand-icon { display: grid; place-items: center; width: 46px; height: 46px; border: 1px solid #ffffff25; border-radius: 12px; background: #ffffff12; }
+.login-intro-copy { max-width: 460px; padding: 60px 0; }
+.login-kicker { display: block; margin-bottom: 15px; font-size: 11px; font-weight: 800; letter-spacing: .16em; }
+.login-intro h1 { margin: 0 0 22px; font-size: clamp(32px, 4vw, 52px); font-weight: 750; line-height: 1.15; letter-spacing: -1.8px; }
+.login-intro p { margin: 0; color: #e3ddff; font-size: 16px; line-height: 1.8; }
+.login-intro-footer { color: #ddd7ff; font-size: 12px; }
+.login-form-panel { display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 48px 28px; }
+.login-form-content { width: 100%; max-width: 390px; margin: auto 0; }
+.login-form-content .login-kicker { color: #6754dc; }
+.login-form-content h2 { margin: 0 0 13px; font-size: 34px; font-weight: 750; letter-spacing: -1px; }
+.login-description { margin-bottom: 32px; color: #747488; font-size: 14px; line-height: 1.7; }
+.login-form { display: flex; flex-direction: column; }
+.login-form label { margin-bottom: 8px; font-size: 13px; font-weight: 700; }
+.login-form input:not([type="hidden"]) { width: 100%; height: 49px; margin-bottom: 22px; padding: 0 14px; border: 1px solid #ddddec; border-radius: 10px; background: #fff; font: inherit; font-size: 14px; }
+.login-form input:focus { outline: 3px solid #6955dc20; border-color: #6955dc; }
+.login-form button { display: flex; align-items: center; justify-content: space-between; min-height: 49px; margin-top: 3px; padding: 12px 18px; border: 0; border-radius: 10px; background: var(--violet); box-shadow: 0 5px 14px #5b48cc20; color: #fff; font: inherit; font-size: 14px; font-weight: 750; cursor: pointer; }
+.login-form button:hover { background: #4935be; }
+.login-form button, .login-form input { transition: background-color .18s ease, box-shadow .18s ease, border-color .18s ease; }
+.login-form button:focus-visible { outline: 3px solid #a99fff; outline-offset: 3px; }
+.login-error { margin-bottom: 22px; padding: 12px 14px; border: 1px solid #f0c8cb; border-radius: 10px; background: #fff0f1; color: #a12938; font-size: 13px; line-height: 1.6; }
+.login-help { margin: 25px 0 0; color: #818192; font-size: 12px; line-height: 1.7; }
+.login-footer { margin-top: 50px; color: #9393a3; font-size: 11px; }
+@media (max-width: 760px) {
+    .login-shell { grid-template-columns: 1fr; }
+    .login-intro { padding: 24px; gap: 24px; }
+    .login-intro-copy { padding: 5px 0; }
+    .login-intro h1 { font-size: 30px; letter-spacing: -.7px; }
+    .login-intro p, .login-intro-footer { display: none; }
+    .login-form-panel { padding: 36px 24px 24px; }
+    .login-form-content h2 { font-size: 28px; }
+    .login-footer { margin-top: 32px; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .login-form-content, .login-intro-copy { animation: appear-up .4s var(--ease); }
+}
+@media (max-width: 760px) {
+    .login-form input:not([type="hidden"]) { font-size: 16px; }
+}
